@@ -1,28 +1,36 @@
 # Obsidian
 
-Obsidian関連の非公式パッチ、ツール、ドキュメントをまとめるリポジトリです。各プロジェクトは独立したフォルダーで管理します。Obsidian公式による提供・承認を示すものではありません。
+English | [日本語](README.ja.md)
 
-## プロジェクト
+Unofficial patches, tools, and documentation for Obsidian. Each project has its own directory. This repository is not provided or endorsed by Obsidian.
 
-| フォルダー | 内容 | 配布形式 |
+## Projects
+
+| Directory | Purpose | Distribution |
 |---|---|---|
-| [obsidian-web-clipper-language-patch](obsidian-web-clipper-language-patch/) | Web ClipperでYouTube字幕の抽出時にブラウザー言語を優先する修正 | パッチ＋ドキュメント |
+| [obsidian-web-clipper-language-patch](obsidian-web-clipper-language-patch/) | Pass the browser language to Defuddle when extracting YouTube transcripts in Web Clipper | Patch and documentation |
+
+## Layout
 
 ```text
 Obsidian/
 ├── README.md
+├── README.ja.md
 └── obsidian-web-clipper-language-patch/
     ├── README.md
+    ├── README.ja.md
     ├── LICENSE
     ├── CHANGELOG.md
+    ├── CHANGELOG.ja.md
     ├── patches/
     │   └── preferred-language.patch
     └── docs/
-        ├── installation.md
-        ├── testing.md
-        └── maintenance.md
+        ├── en/
+        └── ja/
 ```
 
-今後のプロジェクトも、このリポジトリ直下に個別フォルダーとして追加します。各フォルダーのREADMEに目的・導入方法・対応バージョンを、LICENSEにライセンスを記載します。ライセンスはプロジェクトごとに確認してください。
+Future projects will be added as separate directories at the repository root. Each project documents its purpose, installation steps, supported versions, and license. Check the LICENSE in each project before using its contents.
 
-個人のVault、エクスポートした設定JSON、APIキー等は公開対象に含めません。
+English is the default documentation language; Japanese is available through the language links. When updating documentation, keep commands, supported commits, and verification status consistent in both languages.
+
+Personal vaults, exported settings, and API keys are not included.

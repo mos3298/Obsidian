@@ -1,9 +1,18 @@
 # Changelog
 
+English | [日本語](CHANGELOG.ja.md)
+
+## Documentation update — 2026-09-29
+
+- Added English and Japanese READMEs and guides with language-switching links.
+- Kept links at the original guide paths to help existing readers find the translated guides.
+- Removed user-reported live-verification statements.
+- No changes to the v0.1 patch or its supported upstream commit.
+
 ## v0.1 — 2026-09-29
 
-- Web Clipper 1.7.1 / commit `6d56d618b00bd970aa738d6a7a61edee27783e81` 向けの初版。
-- 拡張のDefuddle生成7か所へ希望言語を渡すパッチ。
-- 言語選択・字幕抽出・一般記事の自動テスト9件。
-- 導入、設定移行、検証結果、更新手順を公開。
-- 配布対象はパッチとドキュメントのみ。
+- Initial patch for Web Clipper 1.7.1 / commit `6d56d618b00bd970aa738d6a7a61edee27783e81`.
+- Pass the preferred language to seven Defuddle construction sites in the extension.
+- Add nine automated tests for language selection, transcript extraction, and regular articles.
+- Publish installation, settings migration, verification, and maintenance documentation.
+- Distribute only the patch and documentation.

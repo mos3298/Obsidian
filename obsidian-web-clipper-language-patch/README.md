@@ -1,67 +1,75 @@
 # Obsidian Web Clipper — Browser Language Patch
 
-YouTube字幕の抽出時に、ブラウザーの優先言語をDefuddleへ渡すための非公式パッチです。
+English | [日本語](README.ja.md)
 
-日本語環境で日本語動画をClipしたとき、英語字幕が選ばれる問題を改善することを目的としています。**日本語固定ではありません。** Chromeの言語が日本語なら日本語字幕を優先し、対応する字幕がない場合はDefuddle本来の選択処理へ戻ります。翻訳は行いません。
+An unofficial patch that passes the browser's preferred language to Defuddle when extracting YouTube transcripts.
 
-このパッケージは **パッチとドキュメントのみ** を公開します。公式ソース全体、ビルド済み拡張、公式アイコン、個人設定ファイルは含みません。Obsidian公式による提供・承認を示すものではありません。
+It addresses cases where clipping a Japanese video produces an English transcript. **The patch is not limited to Japanese.** When the browser language is Japanese, it prefers a matching Japanese caption track. If none is available, Defuddle uses its existing fallback behavior. The patch does not translate text.
 
-## 対応バージョン
+This package distributes **only a patch and documentation**. It does not include the full upstream source, a built extension, official icons, or personal settings. It is not provided or endorsed by Obsidian.
 
-| 項目 | 検証対象 |
+## Supported version
+
+| Component | Tested version |
 |---|---|
-| パッチ | v0.1 |
-| 公式Web Clipper | 1.7.1 |
-| 公式commit | [`6d56d618b00bd970aa738d6a7a61edee27783e81`](https://github.com/obsidianmd/obsidian-clipper/commit/6d56d618b00bd970aa738d6a7a61edee27783e81) |
+| Patch | v0.1 |
+| Upstream Web Clipper | 1.7.1 |
+| Upstream commit | [`6d56d618b00bd970aa738d6a7a61edee27783e81`](https://github.com/obsidianmd/obsidian-clipper/commit/6d56d618b00bd970aa738d6a7a61edee27783e81) |
 | Defuddle | 0.19.2 |
 
-**上記commitへの適用を確認しています。公式の最新mainへの適用・動作は保証しません。**
+**The patch was checked against this commit. Compatibility with the latest upstream main is not guaranteed.**
 
-## 使い方
+## Getting started
 
-1. このリポジトリと公式ソースを取得する。
-2. 公式ソースを対応commitに合わせ、[パッチ](patches/preferred-language.patch)を適用する。
-3. 自分の環境でビルドし、生成した `dist` をChromeに読み込む。
+1. Clone this repository and the upstream source.
+2. Check out the supported upstream commit and apply the [patch](patches/preferred-language.patch).
+3. Build locally and load the generated `dist` directory into Chrome.
 
-コマンド、Chromeへの導入、既存設定の移行は **[導入手順](docs/installation.md)** にまとめています。
+See the **[installation guide](docs/en/installation.md)** for commands, Chrome setup, and settings migration.
 
-## 内容
+## Contents
 
 ```text
 obsidian-web-clipper-language-patch/
 ├── README.md
+├── README.ja.md
 ├── LICENSE
 ├── CHANGELOG.md
+├── CHANGELOG.ja.md
 ├── patches/
 │   └── preferred-language.patch
 └── docs/
-    ├── installation.md
-    ├── testing.md
-    └── maintenance.md
+    ├── en/
+    │   ├── installation.md
+    │   ├── testing.md
+    │   └── maintenance.md
+    └── ja/
+        ├── installation.md
+        ├── testing.md
+        └── maintenance.md
 ```
 
-拡張内の7か所で、次の優先順に決めた言語をDefuddleへ渡します。
+The patch passes a language to seven Defuddle construction sites in the extension, using this priority:
 
 1. `navigator.language`
-2. 抽出対象の `document.documentElement.lang`
-3. `undefined`（Defuddleの標準動作）
+2. The source document's `document.documentElement.lang`
+3. `undefined` (Defuddle's default behavior)
 
-変更範囲は通常Clip、Reader、保存ページのHighlight関連抽出です。API／CLIは変更しません。字幕選択UI、独自の字幕取得ロジック、AI翻訳は追加しません。
+It covers regular clipping, Reader, and extraction of saved pages associated with highlights. The API and CLI are unchanged. It adds no caption-selection UI, custom caption-fetching logic, or AI translation.
 
-## 検証状況
+## Verification status
 
-- Chromium / Firefox / Safariのビルド成功。
-- 追加した自動テスト9件成功。
-- Windows / Chromeで日本語字幕が読めたこと、公式版から設定を移行できたことを利用者が報告。
-- 全自動テストは217件成功・6件失敗。6件は変更前でも再現する既存テストの失敗。
-- 英語のみの実動画、実ブラウザーのReader／Highlightなど、未検証の項目があります。
+- Chromium, Firefox, and Safari builds succeeded.
+- All nine added automated tests passed.
+- The full automated suite had 217 passes and six failures. The same six existing failures were reproduced on the unmodified upstream commit.
+- Live regression checks remain incomplete, including English-only videos and browser Reader/Highlight workflows.
 
-詳細は **[検証結果と制限](docs/testing.md)**、更新・復帰・公式への提案は **[メンテナンス手順](docs/maintenance.md)** を参照してください。
+See **[test results and limitations](docs/en/testing.md)** and **[maintenance and upstream contributions](docs/en/maintenance.md)**.
 
-## 関連リンクとライセンス
+## Links and license
 
-- [公式Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper)
-- [関連する公式Issue #957](https://github.com/obsidianmd/obsidian-clipper/issues/957)
-- [公式の開発・ビルド手順（対応commit）](https://github.com/obsidianmd/obsidian-clipper/blob/6d56d618b00bd970aa738d6a7a61edee27783e81/README.md)
+- [Upstream Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper)
+- [Related upstream issue #957](https://github.com/obsidianmd/obsidian-clipper/issues/957)
+- [Upstream development instructions at the supported commit](https://github.com/obsidianmd/obsidian-clipper/blob/6d56d618b00bd970aa738d6a7a61edee27783e81/README.md)
 
-パッチとドキュメントはMITライセンスです。元コードの著作権表示・許諾文を [LICENSE](LICENSE) に保持しています。Obsidianの商標や公式アイコン等の権利は各権利者に帰属します。このリポジトリはそれらの利用許諾を与えるものではありません。
+The patch and documentation are distributed under the MIT License. The upstream copyright and permission notice are preserved in [LICENSE](LICENSE). Obsidian trademarks, official icons, and other brand assets belong to their respective owners; this repository does not grant permission to use those assets.
