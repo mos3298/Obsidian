@@ -13,6 +13,7 @@ This package distributes **only a patch and documentation**. It does not include
 | Component | Tested version |
 |---|---|
 | Patch | v0.1 |
+| Patch repository tag | [`web-clipper-language-patch-v0.1`](https://github.com/mos3298/Obsidian/tree/web-clipper-language-patch-v0.1/obsidian-web-clipper-language-patch) |
 | Upstream Web Clipper | 1.7.1 |
 | Upstream commit | [`6d56d618b00bd970aa738d6a7a61edee27783e81`](https://github.com/obsidianmd/obsidian-clipper/commit/6d56d618b00bd970aa738d6a7a61edee27783e81) |
 | Defuddle | 0.19.2 |

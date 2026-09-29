@@ -15,7 +15,7 @@ The commands below also work in PowerShell. If PowerShell blocks `npm.ps1`, use 
 Run these commands in a working directory. If directories with these names already exist, inspect them and choose a different working location before proceeding.
 
 ```sh
-git clone https://github.com/mos3298/Obsidian.git
+git clone --branch web-clipper-language-patch-v0.1 https://github.com/mos3298/Obsidian.git
 git clone https://github.com/obsidianmd/obsidian-clipper.git obsidian-clipper-local
 cd obsidian-clipper-local
 git checkout --detach 6d56d618b00bd970aa738d6a7a61edee27783e81
@@ -67,10 +67,21 @@ Keep exported settings JSON as a private backup. It may contain API keys; do not
 
 ## 6. Check Japanese transcripts
 
-1. Set Chrome's preferred language to Japanese. The patch prioritizes `navigator.language`, rather than the caption selection displayed on YouTube.
-2. Reload the YouTube tab.
-3. Include `{{transcript}}` in the template body.
-4. Clip the video and check the language of the saved text.
+1. Open Chrome's **Settings → Languages**, add Japanese if needed, and place it first in the preferred-language list. On Windows, also check the option to display Chrome in Japanese if available. Relaunch Chrome if prompted.
+2. Open the target YouTube page, then open Developer Tools with **F12** (or the browser menu) and select **Console**. Type the following read-only expression and press Enter:
+
+   ```js
+   navigator.language
+   ```
+
+3. For Japanese preference, confirm that the result is `"ja"` or `"ja-JP"`. This returned value is what the patch actually passes to Defuddle. If it is `"en-US"` or another language, recheck the browser settings and relaunch before continuing.
+4. Close Developer Tools and reload the YouTube tab.
+5. Include `{{transcript}}` in the template body.
+6. Clip the video and check the language of the saved text.
+
+Browser settings and labels vary by platform. `navigator.language` usually reflects the browser UI language; checking its value avoids assuming that a visible setting has taken effect. See [MDN: Navigator.language](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/language).
+
+The patch uses this one language value, not the entire `navigator.languages` list. It does not use YouTube's selected caption language or the Web Clipper interface language as the preference. A matching caption track must still be available.
 
 For missing transcripts or an unexpected language, see [test results and limitations](testing.md).
 

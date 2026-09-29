@@ -49,6 +49,36 @@ API／CLIとそのテスト内のDefuddle生成も検索で確認しましたが
 
 通常の `tsc --noEmit` は、既存tsconfigのmodule=es6とCLI等のdynamic importが整合しないため失敗します。Webpackはmodule=ES2020を指定しています。
 
+## 既存の6件の失敗を照合する
+
+失敗したのは、すべて `src/utils/template-integration.test.ts` の `Template fixtures` にある次の6件です。
+
+| フィクスチャ名 | 変更前での観測 | パッチ適用後での観測 |
+|---|---|---|
+| `edge-cases` | FAIL | FAIL |
+| `goodreads` | FAIL | FAIL |
+| `imdb` | FAIL | FAIL |
+| `minimal` | FAIL | FAIL |
+| `schema-rich` | FAIL | FAIL |
+| `youtube` | FAIL | FAIL |
+
+例えば `minimal` では、生成結果のLF改行（`\n`）と期待値ファイルのCRLF改行（`\r\n`）に差がありました。`youtube` では日時にも差があり、期待値は `2025-01-15T04:00:00-08:00`、実際は `2025-01-15T21:00:00+09:00` でした。これは同じ時刻を異なるタイムゾーンで表したものです。
+
+自分の環境で比較する場合は、導入手順のパッチ適用済み `obsidian-clipper-local` ディレクトリから実行します。隣の `obsidian-clipper-baseline` ディレクトリが存在しない状態で始めてください。
+
+```sh
+git worktree add --detach ../obsidian-clipper-baseline 6d56d618b00bd970aa738d6a7a61edee27783e81
+cd ../obsidian-clipper-baseline
+npm ci
+npx vitest run src/utils/template-integration.test.ts
+cd ../obsidian-clipper-local
+npx vitest run src/utils/template-integration.test.ts
+```
+
+検証時はWindows、タイムゾーンAsia/Tokyo、期待値ファイルはCRLFでした。変更前でこのファイルを実行した結果は6件失敗・5件成功（計11件）です。改行やタイムゾーンによっては全件成功する環境もあるため、6件失敗させるために環境を変更する必要はありません。同じ環境で変更前・変更後のテスト名と差分を照合してください。失敗数が6件というだけで、新しい失敗を既存のものと判断しないでください。
+
+追加テスト9件は、パッチ適用済みディレクトリで `npx vitest run src/utils/preferred-language.test.ts` を実行します。PowerShellスクリプトの実行が制限される場合は `npm.cmd`、`npx.cmd` を使用してください。
+
 ## 未検証・制限
 
 - 英語字幕のみ／日本語字幕のみの実動画での回帰確認。

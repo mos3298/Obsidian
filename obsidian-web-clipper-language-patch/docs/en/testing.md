@@ -49,6 +49,36 @@ The full suite had **217 passes and six failures out of 223 tests**. Six existin
 
 Plain `tsc --noEmit` fails because the existing tsconfig uses module=es6 while the CLI and other files use dynamic imports. Webpack specifies module=ES2020.
 
+## Comparing the six existing failures
+
+All six failures were in `src/utils/template-integration.test.ts`, under `Template fixtures`:
+
+| Fixture | Observed on unmodified upstream | Observed with the patch |
+|---|---|---|
+| `edge-cases` | FAIL | FAIL |
+| `goodreads` | FAIL | FAIL |
+| `imdb` | FAIL | FAIL |
+| `minimal` | FAIL | FAIL |
+| `schema-rich` | FAIL | FAIL |
+| `youtube` | FAIL | FAIL |
+
+For example, the `minimal` assertion compared output containing LF line endings (`\n`) with an expected file containing CRLF (`\r\n`). In `youtube`, the generated date also differed: expected `2025-01-15T04:00:00-08:00`, actual `2025-01-15T21:00:00+09:00`. These are the same instant expressed in different timezones.
+
+To compare on your own machine, start in the patched `obsidian-clipper-local` directory from the installation guide. The sibling directory `obsidian-clipper-baseline` must not already exist.
+
+```sh
+git worktree add --detach ../obsidian-clipper-baseline 6d56d618b00bd970aa738d6a7a61edee27783e81
+cd ../obsidian-clipper-baseline
+npm ci
+npx vitest run src/utils/template-integration.test.ts
+cd ../obsidian-clipper-local
+npx vitest run src/utils/template-integration.test.ts
+```
+
+The verification run used Windows, the Asia/Tokyo timezone, and CRLF expected files. The baseline run of this file had six failures and five passes (11 tests). Line endings and timezone affect these fixtures, so another environment may pass them; do not alter the environment just to obtain six failures. Compare test names and assertion differences between unmodified and patched source in the same environment. Do not dismiss a new failure merely because the total is six.
+
+For the nine added tests, run `npx vitest run src/utils/preferred-language.test.ts` in the patched directory. In PowerShell, use `npm.cmd` and `npx.cmd` if the corresponding PowerShell scripts are blocked.
+
 ## Unverified behavior and limitations
 
 - Live regression checks for English-only and Japanese-only videos.

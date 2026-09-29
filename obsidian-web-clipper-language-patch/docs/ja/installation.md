@@ -15,7 +15,7 @@
 作業用フォルダーで次を実行します。同名フォルダーが既にある場合は、その内容を確認してから別の作業場所を選んでください。
 
 ```sh
-git clone https://github.com/mos3298/Obsidian.git
+git clone --branch web-clipper-language-patch-v0.1 https://github.com/mos3298/Obsidian.git
 git clone https://github.com/obsidianmd/obsidian-clipper.git obsidian-clipper-local
 cd obsidian-clipper-local
 git checkout --detach 6d56d618b00bd970aa738d6a7a61edee27783e81
@@ -67,10 +67,21 @@ npm run build:chrome
 
 ## 6. 日本語字幕を確認
 
-1. Chromeの優先言語を日本語にします。このパッチはYouTube画面の字幕選択ではなく、`navigator.language` を優先します。
-2. YouTubeタブを再読み込みします。
-3. テンプレートの本文へ `{{transcript}}` を含めます。
-4. 動画をClipし、実際に保存された本文の言語を確認します。
+1. Chromeの「設定 → 言語」で、必要なら日本語を追加し、優先言語の先頭にします。Windowsでは「Google Chromeをこの言語で表示」の項目があれば、その設定も確認します。再起動を求められた場合はChromeを再起動してください。
+2. 対象のYouTubeページを開き、**F12**（またはブラウザーのメニュー）から開発者ツールを開いて「Console」を選びます。次の読み取り専用の式を入力し、Enterを押します。
+
+   ```js
+   navigator.language
+   ```
+
+3. 日本語を優先する場合、結果が `"ja"` または `"ja-JP"` であることを確認します。パッチが実際にDefuddleへ渡すのはこの値です。`"en-US"` など別の言語なら、ブラウザー設定と再起動を確認してから進んでください。
+4. 開発者ツールを閉じ、YouTubeタブを再読み込みします。
+5. テンプレートの本文へ `{{transcript}}` を含めます。
+6. 動画をClipし、実際に保存された本文の言語を確認します。
+
+設定項目や名称はOSによって異なります。`navigator.language` は通常ブラウザーの表示言語に関連するため、設定画面だけで判断せず返り値を確認します。[MDN: Navigator.language](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/language)も参照してください。
+
+パッチが使うのはこの1つの言語で、`navigator.languages` の一覧全体ではありません。YouTubeで選択した字幕言語やWeb Clipperの画面表示言語を優先設定として使うものでもありません。また、対応する字幕トラックが存在する必要があります。
 
 字幕が取得できない場合や、英語のままの場合は [検証結果と制限](testing.md) を参照してください。
 

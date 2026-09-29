@@ -13,6 +13,7 @@ YouTube字幕の抽出時に、ブラウザーの優先言語をDefuddleへ渡�
 | 項目 | 検証対象 |
 |---|---|
 | パッチ | v0.1 |
+| パッチ側の固定タグ | [`web-clipper-language-patch-v0.1`](https://github.com/mos3298/Obsidian/tree/web-clipper-language-patch-v0.1/obsidian-web-clipper-language-patch) |
 | 公式Web Clipper | 1.7.1 |
 | 公式commit | [`6d56d618b00bd970aa738d6a7a61edee27783e81`](https://github.com/obsidianmd/obsidian-clipper/commit/6d56d618b00bd970aa738d6a7a61edee27783e81) |
 | Defuddle | 0.19.2 |

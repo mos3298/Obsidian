@@ -6,7 +6,8 @@ English | [日本語](CHANGELOG.ja.md)
 
 - Added English and Japanese READMEs and guides with language-switching links.
 - Kept links at the original guide paths to help existing readers find the translated guides.
-- Removed user-reported live-verification statements.
+- Clarified how to check the selected browser language and compare the six existing test failures.
+- Pinned v0.1 with the `web-clipper-language-patch-v0.1` tag.
 - No changes to the v0.1 patch or its supported upstream commit.
 
 ## v0.1 — 2026-09-29

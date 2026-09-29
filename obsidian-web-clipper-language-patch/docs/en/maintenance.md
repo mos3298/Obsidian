@@ -6,6 +6,8 @@ English | [日本語](../ja/maintenance.md) · [README](../../README.md)
 
 The patch is maintained against a pinned upstream commit. Changes to upstream main are not automatically incorporated into an installed local build.
 
+The initial patch and its documentation are pinned by the `web-clipper-language-patch-v0.1` tag. Keep published version tags at their original commits; use a new version tag for a future release rather than moving an existing tag.
+
 For each update:
 
 1. Check whether upstream already includes an equivalent fix.
