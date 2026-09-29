@@ -1,0 +1,9 @@
+# Build output and personal exports do not belong in this patch-only repository.
+node_modules/
+dist/
+dist_*/
+builds/
+*.zip
+obsidian-web-clipper-settings*.json
+.env
+.env.*

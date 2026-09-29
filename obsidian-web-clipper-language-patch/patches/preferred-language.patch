@@ -1,0 +1,194 @@
+diff --git a/src/content.ts b/src/content.ts
+index 864faaf..e206bce 100644
+--- a/src/content.ts
++++ b/src/content.ts
+@@ -5,6 +5,7 @@ import { loadSettings, generalSettings } from './utils/storage-utils';
+ import { getDomain } from './utils/string-utils';
+ import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
+ import Defuddle from 'defuddle';
++import { getPreferredLanguage } from './utils/preferred-language';
+ import { createMarkdownContent } from 'defuddle/full';
+ import { flattenShadowDom } from './utils/flatten-shadow-dom';
+ import { serializeChildren } from './utils/dom-utils';
+@@ -215,7 +216,7 @@ declare global {
+ 
+ 				// Use parseAsync to ensure async variables like {{transcript}} are available.
+ 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
+-				const defuddle = new Defuddle(document, { url: document.URL });
++				const defuddle = new Defuddle(document, { url: document.URL, language: getPreferredLanguage(document) });
+ 				const parseTimeout = new Promise<never>((_, reject) =>
+ 					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
+ 				);
+diff --git a/src/core/highlights.ts b/src/core/highlights.ts
+index 170b1ad..ff470bb 100644
+--- a/src/core/highlights.ts
++++ b/src/core/highlights.ts
+@@ -4,6 +4,7 @@ import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i
+ import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
+ import DOMPurify from 'dompurify';
+ import Defuddle from 'defuddle';
++import { getPreferredLanguage } from '../utils/preferred-language';
+ import { createMarkdownContent } from 'defuddle/full';
+ import { getFontCss } from '../utils/font-utils';
+ import { ReaderSettings } from '../types/types';
+@@ -1134,7 +1135,7 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
+ 		base.href = url;
+ 		doc.head.prepend(base);
+ 
+-		const defuddled = new Defuddle(doc, { url }).parse();
++		const defuddled = new Defuddle(doc, { url, language: getPreferredLanguage(doc) }).parse();
+ 
+ 		const title = defuddled.title || undefined;
+ 		const site = defuddled.site || undefined;
+diff --git a/src/core/reader-view.ts b/src/core/reader-view.ts
+index b7d9952..21595b7 100644
+--- a/src/core/reader-view.ts
++++ b/src/core/reader-view.ts
+@@ -9,6 +9,7 @@ import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repo
+ import { throttle } from '../utils/throttle';
+ import { loadSettings } from '../utils/storage-utils';
+ import Defuddle from 'defuddle';
++import { getPreferredLanguage } from '../utils/preferred-language';
+ 
+ type MessageListener = (request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined;
+ let readerPageMessageListener: MessageListener | null = null;
+@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
+ 		const parsedDoc = parser.parseFromString(html, 'text/html');
+ 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
+ 
+-		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
++		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse, language: getPreferredLanguage(parsedDoc) });
+ 		const result = await defuddle.parseAsync();
+ 
+ 		if (!result.content) {
+@@ -219,7 +220,7 @@ async function loadArticle(newUrl: string) {
+ 		const parsedDoc = parser.parseFromString(html, 'text/html');
+ 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
+ 
+-		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
++		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse, language: getPreferredLanguage(parsedDoc) });
+ 		const result = await defuddle.parseAsync();
+ 
+ 		if (!result.content) {
+diff --git a/src/utils/clip-utils.ts b/src/utils/clip-utils.ts
+index cd2546b..8590cd6 100644
+--- a/src/utils/clip-utils.ts
++++ b/src/utils/clip-utils.ts
+@@ -1,4 +1,5 @@
+ import Defuddle from 'defuddle/full';
++import { getPreferredLanguage } from './preferred-language';
+ import { setElementHTML } from './dom-utils';
+ 
+ // Parse document content for clipping. In reader mode, extracts from
+@@ -15,7 +16,7 @@ export function parseForClip(doc: Document) {
+ 				...Array.from(readerArticle.childNodes).map(n => readerDoc.importNode(n, true))
+ 			);
+ 		}
+-		return new Defuddle(readerDoc, { url: '' }).parse();
++		return new Defuddle(readerDoc, { url: '', language: getPreferredLanguage(doc) }).parse();
+ 	}
+-	return new Defuddle(doc, { url: doc.URL }).parse();
++	return new Defuddle(doc, { url: doc.URL, language: getPreferredLanguage(doc) }).parse();
+ }
+diff --git a/src/utils/preferred-language.test.ts b/src/utils/preferred-language.test.ts
+new file mode 100644
+index 0000000..bfb8580
+--- /dev/null
++++ b/src/utils/preferred-language.test.ts
+@@ -0,0 +1,64 @@
++// @vitest-environment jsdom
++import { afterEach, describe, expect, test, vi } from 'vitest';
++import Defuddle from 'defuddle';
++import { createMarkdownContent } from 'defuddle/full';
++import { getPreferredLanguage } from './preferred-language';
++
++afterEach(() => vi.unstubAllGlobals());
++
++describe('preferred extraction language', () => {
++	test('browser language takes precedence over the source document', () => {
++		vi.stubGlobal('navigator', { language: 'ja-JP' });
++		const doc = new DOMParser().parseFromString('<html lang="en"></html>', 'text/html');
++		expect(getPreferredLanguage(doc)).toBe('ja-JP');
++	});
++
++	test.each([undefined, { language: '' }])('falls back to the source document without a browser language (%j)', nav => {
++		vi.stubGlobal('navigator', nav);
++		const doc = new DOMParser().parseFromString('<html lang="ja"></html>', 'text/html');
++		expect(getPreferredLanguage(doc)).toBe('ja');
++		expect(getPreferredLanguage()).toBeUndefined();
++		expect(getPreferredLanguage(new DOMParser().parseFromString('<html></html>', 'text/html'))).toBeUndefined();
++	});
++
++	// Synthetic network responses test the installed Defuddle implementation;
++	// these are not evidence of a successful live YouTube clip.
++	test.each([
++		{ tracks: ['en-US', 'ja-JP'], preferred: undefined, expected: 'English transcript example.' },
++		{ tracks: ['en-US', 'ja-JP'], preferred: 'ja-JP', expected: '日本語字幕のテストです。' },
++		{ tracks: ['en-US', 'ja-JP'], preferred: 'ja', expected: '日本語字幕のテストです。' },
++		{ tracks: ['en-US'], preferred: 'ja-JP', expected: 'English transcript example.' },
++		{ tracks: ['ja-JP'], preferred: 'ja-JP', expected: '日本語字幕のテストです。' },
++	])('extracts the expected transcript: $tracks / $preferred', async ({ tracks, preferred, expected }) => {
++		vi.stubGlobal('navigator', { language: preferred });
++		const url = 'https://www.youtube.com/watch?v=fixture0001';
++		const doc = new DOMParser().parseFromString('<html><head><title>Fixture</title></head><body></body></html>', 'text/html');
++		const fetchFixture = vi.fn(async (input: RequestInfo | URL) => {
++			const request = String(input);
++			if (request.includes('/player?')) return new Response(JSON.stringify({
++				videoDetails: { videoId: 'fixture0001' },
++				captions: { playerCaptionsTracklistRenderer: { captionTracks: tracks.map(languageCode => ({
++					languageCode, baseUrl: `https://www.youtube.com/api/timedtext?lang=${languageCode}`,
++				})) } },
++			}));
++			if (request.includes('/timedtext?')) return new Response(`<transcript><text start="0" dur="3">${request.includes('lang=ja') ? '日本語字幕のテストです。' : 'English transcript example.'}</text></transcript>`);
++			if (request.includes('/next?')) return new Response('{}');
++			throw new Error(`Unexpected fixture request: ${request}`);
++		});
++		const result = await new Defuddle(doc, { url, language: getPreferredLanguage(doc), fetch: fetchFixture }).parseAsync();
++		expect(JSON.stringify(result.variables)).toContain(expected);
++		expect(fetchFixture.mock.calls.some(([request]) => String(request).includes('/timedtext?'))).toBe(true);
++	});
++
++	test('preserves article metadata, content, and Markdown', () => {
++		vi.stubGlobal('navigator', { language: 'ja-JP' });
++		const html = '<html lang="en"><head><title>Example article</title><meta name="author" content="Example Author"></head><body><article><h1>Example article</h1><p>' + 'This is an article with useful details and a <strong>bold phrase</strong>. '.repeat(20) + '</p></article></body></html>';
++		const parse = (language?: string) => new Defuddle(new DOMParser().parseFromString(html, 'text/html'), { url: 'https://example.com/article', language }).parse();
++		const before = parse();
++		const after = parse(getPreferredLanguage());
++		expect(after.title).toBe('Example article');
++		expect(after.author).toBe('Example Author');
++		expect(after.content).toBe(before.content);
++		expect(createMarkdownContent(after.content, 'https://example.com/article')).toBe(createMarkdownContent(before.content, 'https://example.com/article'));
++	});
++});
+diff --git a/src/utils/preferred-language.ts b/src/utils/preferred-language.ts
+new file mode 100644
+index 0000000..105307c
+--- /dev/null
++++ b/src/utils/preferred-language.ts
+@@ -0,0 +1,7 @@
++// Prefer the browser language, then the source document's language.
++export function getPreferredLanguage(doc?: Document): string | undefined {
++	if (typeof navigator !== 'undefined' && navigator.language) {
++		return navigator.language;
++	}
++	return doc?.documentElement?.lang || undefined;
++}
+diff --git a/src/utils/reader.ts b/src/utils/reader.ts
+index 9b4ccae..afe916a 100644
+--- a/src/utils/reader.ts
++++ b/src/utils/reader.ts
+@@ -1,4 +1,5 @@
+ import Defuddle from 'defuddle/full';
++import { getPreferredLanguage } from './preferred-language';
+ import browser from './browser-polyfill';
+ import { detectBrowser } from './browser-detection';
+ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
+@@ -874,7 +875,7 @@ export class Reader {
+ 			return pre;
+ 		}
+ 
+-		const defuddle = new Defuddle(doc, { url: doc.URL });
++		const defuddle = new Defuddle(doc, { url: doc.URL, language: getPreferredLanguage(doc) });
+ 		const defuddled = await defuddle.parseAsync();
+ 
+ 		return {
