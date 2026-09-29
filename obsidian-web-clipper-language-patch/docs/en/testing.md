@@ -79,10 +79,23 @@ The verification run used Windows, the Asia/Tokyo timezone, and CRLF expected fi
 
 For the nine added tests, run `npx vitest run src/utils/preferred-language.test.ts` in the patched directory. In PowerShell, use `npm.cmd` and `npx.cmd` if the corresponding PowerShell scripts are blocked.
 
+## Manual checks in Chrome
+
+The following results were checked with the patched extension on 2026-09-29.
+
+| Case | Observed result |
+|---|---|
+| Video with English and Japanese caption tracks | Japanese transcript displayed in the Clipper preview |
+| Video with Japanese captions only | Japanese transcript displayed in the Clipper preview |
+| Video with English captions only | English transcript displayed in the Clipper preview |
+| Regular web article | Extracted and saved to Obsidian; title, image, list, heading, and body displayed without major formatting problems in the inspected portion |
+
+The video checks cover extraction and preview. The article check also covers the saved note display. Capturing YouTube's auto-translated display is outside the scope of this patch.
+
 ## Unverified behavior and limitations
 
-- Live regression checks for English-only and Japanese-only videos.
-- Complete regular-article, Reader, and Highlight workflows in Chrome.
+- Saved-note verification for video transcripts.
+- Saving through Reader and Highlight workflows in Chrome.
 - Runtime behavior in Firefox and Safari (builds only were checked).
 - Applying the patch to commits other than the pinned version.
 - Transcript retrieval failures caused by YouTube responses or future changes.

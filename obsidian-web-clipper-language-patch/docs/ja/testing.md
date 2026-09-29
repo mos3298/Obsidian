@@ -79,10 +79,23 @@ npx vitest run src/utils/template-integration.test.ts
 
 追加テスト9件は、パッチ適用済みディレクトリで `npx vitest run src/utils/preferred-language.test.ts` を実行します。PowerShellスクリプトの実行が制限される場合は `npm.cmd`、`npx.cmd` を使用してください。
 
+## Chromeでの手動確認
+
+2026-09-29、パッチ版で次の結果を確認しました。
+
+| ケース | 確認できた結果 |
+|---|---|
+| 英語・日本語の字幕がある動画 | Clipperのプレビューに日本語のTranscriptを表示 |
+| 日本語字幕のみの動画 | Clipperのプレビューに日本語のTranscriptを表示 |
+| 英語字幕のみの動画 | Clipperのプレビューに英語のTranscriptを表示 |
+| 通常のWeb記事 | 抽出してObsidianへ保存。表示範囲でタイトル・画像・箇条書き・見出し・本文に大きな崩れなし |
+
+動画の結果は抽出・プレビューの確認です。通常記事は保存後のノート表示まで確認しています。YouTube側の自動翻訳表示を取り込む機能は今回のパッチには含まれません。
+
 ## 未検証・制限
 
-- 英語字幕のみ／日本語字幕のみの実動画での回帰確認。
-- 実Chromeでの一般記事・Reader・Highlightの一連の操作。
+- 動画Transcriptの保存後の本文確認。
+- 実ChromeでのReader・Highlight経由の保存。
 - 実Firefox／Safariでの実行（ビルドのみ確認）。
 - 上記commit以外への適用。
 - YouTubeの応答や仕様変更による字幕取得失敗。

@@ -63,7 +63,8 @@ It covers regular clipping, Reader, and extraction of saved pages associated wit
 - Chromium, Firefox, and Safari builds succeeded.
 - All nine added automated tests passed.
 - The full automated suite had 217 passes and six failures. The same six existing failures were reproduced on the unmodified upstream commit.
-- Live regression checks remain incomplete, including English-only videos and browser Reader/Highlight workflows.
+- Manual checks in patched Chrome covered extraction and preview for videos with both English and Japanese tracks, Japanese-only tracks, and English-only tracks; a regular article was also saved to Obsidian.
+- Saved video transcripts and saving through Reader/Highlight remain unverified.
 
 See **[test results and limitations](docs/en/testing.md)** and **[maintenance and upstream contributions](docs/en/maintenance.md)**.
 

@@ -2,6 +2,11 @@
 
 English | [日本語](CHANGELOG.ja.md)
 
+## Manual verification update — 2026-09-29
+
+- Documented Chrome transcript previews for bilingual, Japanese-only, and English-only caption tracks, and saving a regular article to Obsidian.
+- Updated the remaining unverified cases. The patch and v0.1 tag are unchanged.
+
 ## Documentation update — 2026-09-29
 
 - Added English and Japanese READMEs and guides with language-switching links.

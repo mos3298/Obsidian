@@ -63,7 +63,8 @@ obsidian-web-clipper-language-patch/
 - Chromium / Firefox / Safariのビルド成功。
 - 追加した自動テスト9件成功。
 - 全自動テストは217件成功・6件失敗。6件は変更前でも再現する既存テストの失敗。
-- 英語のみの実動画、実ブラウザーのReader／Highlightなど、未検証の項目があります。
+- Chromeのパッチ版で、英語・日本語の両字幕、日本語のみ、英語のみの動画の抽出・プレビューを確認。通常記事はObsidianへの保存まで確認。
+- 動画の保存後の本文とReader／Highlight経由の保存は未確認です。
 
 詳細は **[検証結果と制限](docs/ja/testing.md)**、更新・復帰・公式への提案は **[メンテナンス手順](docs/ja/maintenance.md)** を参照してください。
 
